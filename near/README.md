@@ -10,3 +10,4 @@ https://near.sh/articles
 
 - [協調型スレッディング](design/cooperative-threading.md)
 - [スケジューラ](design/schedulers.md)
+- [階層構造](design/hierarchy/README.md)

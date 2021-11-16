@@ -2,6 +2,10 @@
 
 https://near.sh/articles
 
+## CPU
+
+- [ALU](cpu/alu.md)
+
 ## グラフィック
 
 - [色調エミュレーション](video/color-emulation/README.md)

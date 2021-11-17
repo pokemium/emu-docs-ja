@@ -20,3 +20,7 @@ https://near.sh/articles
 - [協調型スレッディング](design/cooperative-threading.md)
 - [スケジューラ](design/schedulers.md)
 - [階層構造](design/hierarchy/README.md)
+
+## アドバイス
+
+- [巨人の肩に乗ろう](advice/shoulders-of-giants.md)

@@ -13,7 +13,7 @@ https://near.sh/articles
 ## 入力
 
 - [入力遅延](input/latency.md)
-- [先読み](input/run-ahead.md)
+- [先読み](input/run-ahead/README.md)
 
 ## 設計
 

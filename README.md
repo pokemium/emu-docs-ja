@@ -4,6 +4,7 @@
 
 - [翻訳: Near's Respite](near/README.md)
 - [翻訳: エミュレータの精度と速度について](emulation-accuracy.md)
+- [その他・未分類のデータ](others/)
 
 ### コンソール
 

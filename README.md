@@ -5,6 +5,7 @@
 - [翻訳: Near's Respite](near/README.md)
 - [エミュレータの精度と速度について](emulation-accuracy.md)
 - [LLE vs HLE](lle-vs-hle.md)
+- [IPSファイル](ips_file_format.md)
 - [その他・未分類のデータ](others/)
 
 ### コンソール

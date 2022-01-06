@@ -6,6 +6,7 @@
 - [エミュレータの精度と速度について](emulation-accuracy.md)
 - [LLE vs HLE](lle-vs-hle.md)
 - [IPSファイル](ips_file_format.md)
+- [ネット対戦(WIP)](netplay.md)
 - [その他・未分類のデータ](others/)
 
 ### コンソール

@@ -3,6 +3,7 @@
 ## コンテンツ一覧
 
 - [翻訳: Near's Respite](near/README.md)
+- [翻訳: Libretro Docs](libretro/)
 - [エミュレータの精度と速度について](emulation-accuracy.md)
 - [LLE vs HLE](lle-vs-hle.md)
 - [IPSファイル](ips_file_format.md)

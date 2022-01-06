@@ -1,10 +1,4 @@
-# ネット対戦
-
-<pre>
-Note: 
-
-この記事は<a href="https://docs.libretro.com/development/retroarch/netplay/">Netplay - Libretro Docs</a>を翻訳したもので、主にエミュレータ開発者向けです。
-</pre>
+# ネット対戦(WIP)
 
 RetroArchでは、インターネット経由で2人目以降のプレイヤーや観客を接続することができます。
 

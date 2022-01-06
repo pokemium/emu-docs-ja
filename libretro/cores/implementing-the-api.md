@@ -1,4 +1,4 @@
-# Libretorコアの開発 ~Libretro APIの実装~
+# Libretorコアの開発 \~Libretro APIの実装\~
 
 <pre>
 Note: 

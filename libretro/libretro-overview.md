@@ -1,4 +1,4 @@
-# Libretro Development Overview
+# Libretroを用いた開発について
 
 Libretro APIは、汎用的なオーディオ、ビデオ、入力のコールバックを公開する、軽量なCベースのアプリケーション・プログラミング・インターフェース（API）です。
 
@@ -31,7 +31,7 @@ libretroのフロントエンドの数は増え続けており、様々なホス
 
 RetroArch は libretro のフロントエンドの参考例と言っていいほどの完成度で、さまざまなホストプラットフォームで利用できます。RetroARchの開発については、`For Developers > RetroArch Development`のセクションで詳しく説明しています。
 
-## Libretro-powered operating systems
+## Libretro上で動作するOS
 
 LibreELECをベースにした[`Lakka`](http://www.lakka.tv/)は、Libretroを使ったOSディストリビューションのいいリファレンスと言えるでしょう。
 

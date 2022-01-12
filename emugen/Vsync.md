@@ -1,11 +1,5 @@
 # Vsync
 
-<pre>
-Note: 
-
-この記事は<a href="https://emulation.gametechwiki.com/index.php/Vsync">VSync</a>を翻訳したもので、主にエミュレータ開発者向けです。
-</pre>
-
 Vsync（Vertical Synchronizationの略）は、ゲームのビデオ出力をディスプレイのリフレッシュレートに同期させ、画面のティアリングを防ぐために使われます。垂直同期とも言われます。
 
 エミュレータでのVsyncはこれまで問題が多く、ドライバのバッファリングによる遅延の問題や、ゲームがエミュレータと異なるリフレッシュレートで動作することによるスタッタリングが発生していました。

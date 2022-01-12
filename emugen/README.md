@@ -1,14 +1,20 @@
 # Emulation General Wiki
 
-https://emulation.gametechwiki.com/index.php/Main_Page
+https://emulation.gametechwiki.com/index.php
 
-## FAQs
+## 🖲 Not really emulators
+
+### Frontends
+
+- [RetroArch](RetroArch.md)
+
+## ❓ FAQs
 
 - [Netplay](Netplay.md)
 - [VSync](Vsync.md)
 - [ビデオ録画](Recording_Video.md)
 
-## Shaders and filters
+## 🪅 Shaders and filters
 
 - [テクスチャフィルタリング](Texture_filtering.md)
 

@@ -10,6 +10,10 @@ https://near.sh/articles
 
 - [色調エミュレーション](video/color-emulation/README.md)
 
+## オーディオ
+
+- [DRC - Dynamic Rate Control](audio/dynamic-rate-control.md)
+
 ## 入力
 
 - [入力遅延](input/latency.md)

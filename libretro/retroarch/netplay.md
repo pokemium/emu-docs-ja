@@ -68,7 +68,36 @@ TODO
 
 ## プロトコル
 
-TODO
+ネットプレイの接続には、クライアントとサーバーが同じソフトウェアを使用していることを確認し、クライアントを同期させるためのハンドシェイクが必要です。
+
+クライアントとサーバが同じソフトウェアを使用していることを確認し、クライアントを同期させるためのハンドシェイクが行われます。その後、入力パケットの交換が行われます。
+
+**ハンドシェイクの手順**
+
+この部分はサーバーとクライアントの両方が行います。
+
+1. Send connection header
+2. Receive and verify connection header
+3. Send nickname
+4. Receive nickname
+
+クライアント側のみ
+
+5. Send PASSWORD if applicable
+4. Receive INFO
+5. Send INFO
+6. Receive SYNC
+
+サーバー側のみ
+
+5. Receive PASSWORD if applicable
+6. Send INFO
+7. Receive INFO
+8. Send SYNC
+
+なお、サーバーとクライアントの両方が、コネクションヘッダを読む前に送信しています。これは意図的なものです。
+
+これにより、サーバーとクライアントのどちらか（両方ではない）が、相手側の接続ヘッダをエコーすることで、一般化することができます。
 
 ## Other features
 
@@ -77,3 +106,251 @@ TODO
 入力レイテンシの利点は、実際の実行がフレーム数よりも遅れることです。フレーム数に比べて実際の実行が遅れるため、遠隔地のデータが利用できることが多くなり、巻き戻しの頻度もコストも少なくて済みます。
 
 ステートバッファには、入力遅延が有効な場合に使用される`run`というロケーションが追加されています。この場合、`self`は入力が読み込まれている場所を指し、`run`は実際に実行されているフレームを指します。`run`は純粋にローカルです。
+
+## コマンドフォーマット
+
+Netplayコマンドは、32ビットのコマンド識別子と、それに続く32ビットのペイロードサイズ（いずれもネットワークのバイトオーダーに準拠）と、それに続くペイロードで構成されています。
+
+コマンド識別子は`netplay.h`に記載されており、以下にコマンドを説明します。特に指定のない限り、ペイロードの値はすべてネットワークのバイトオーダーに準拠です。
+
+**Command**: ACK
+Payload: None
+Description:
+> Acknowledgement. Not used.
+
+**Command**: NAK
+Payload: None
+Description:
+> Negative Acknowledgement. If received, the connection is terminated. Sent
+> whenever a command is malformed or otherwise not understood.
+
+**Command**: DISCONNECT
+Payload: None
+Description:
+> Gracefully disconnect. Not used.
+
+**Command**: INPUT
+Payload:
+
+    {
+       frame number: uint32
+       is server data: 1 bit
+       player: 31 bits
+       controller input: uint32
+       analog 1 input: uint32
+       analog 2 input: uint32
+    }
+
+Description:
+> Input state for each frame. Netplay must send an INPUT command for every
+> frame in order to function at all. Client's player value is ignored. Server
+> indicates which frames are its own input data because INPUT is a
+> synchronization point: No synchronization events from the given frame may
+> arrive after the server's input for the frame.
+
+**Command**: NOINPUT
+Payload:
+
+    {
+       frame number: uint32
+    }
+
+Description:
+> Sent by the server to indicate a frame has passed when the server is not
+> otherwise sending data.
+
+**Command**: NICK
+Payload:
+
+    {
+       nickname: char[32]
+    }
+
+Description:
+> Send nickname. Mandatory handshake command.
+
+**Command**: PASSWORD
+Payload:
+
+    {
+       password hash: char[64]
+    }
+
+Description:
+> Send hashed password to server. Mandatory handshake command for clients if
+> the server demands a password.
+
+**Command**: INFO
+Payload
+
+    {
+       core name: char[32]
+       core version: char[32]
+       content CRC: uint32
+    }
+
+Description:
+> Send core/content info. Mandatory handshake command. Sent by server first,
+> then by client, and must match. Server may send INFO with no payload, in
+> which case the client sends its own info and expects the server to load the
+> appropriate core and content then send a new INFO command. If mutual
+> agreement cannot be achieved, the correct solution is to simply disconnect.
+
+**Command**: SYNC
+Payload:
+
+    {
+       frame number: uint32
+       paused?: 1 bit
+       connected players: 31 bits
+       flip frame: uint32
+       controller devices: uint32[16]
+       client nick: char[32]
+       sram: variable
+    }
+
+Description:
+> Initial state synchronization. Mandatory handshake command from server to
+> client only. Connected players is a bitmap with the lowest bit being player
+> 0. Flip frame is 0 if players aren't flipped. Controller devices are the
+> devices plugged into each controller port, and 16 is really MAX_USERS.
+> Client is forced to have a different nick if multiple clients have the same
+> nick.
+
+**Command**: SPECTATE
+Payload: None
+Description:
+> Request to enter spectate mode. The client should immediately consider itself
+> to be in spectator mode and send no further input.
+
+**Command**: PLAY
+Payload:
+
+    {
+       reserved: 31 bits
+       as slave?: 1 bit
+    }
+
+Description:
+> Request to enter player mode. The client must wait for a MODE command before
+> sending input. Server may refuse or force slave connections, so the request
+> is not necessarily honored. Payload may be elided if zero.
+
+**Command**: MODE
+Payload:
+
+    {
+       frame number: uint32
+       reserved: 13 bits
+       slave: 1 bit
+       playing: 1 bit
+       you: 1 bit
+       player number: uint16
+    }
+
+Description:
+> Inform of a connection mode change (possibly of the receiving client). Only
+> server-to-client. Frame number is the first frame in which player data is
+> expected, or the first frame in which player data is not expected. In the
+> case of new players the frame number must be later than the last frame of the
+> server's own input that has been sent, and in the case of leaving players the
+> frame number must be later than the last frame of the relevant player's input
+> that has been transmitted.
+
+**Command**: MODE_REFUSED
+Payload:
+
+    {
+       reason: uint32
+    }
+
+Description:
+> Inform a client that its request to change modes has been refused.
+
+**Command**: CRC
+Payload:
+
+    {
+       frame number: uint32
+       hash: uint32
+    }
+
+Description:
+> Informs the peer of the correct CRC hash for the specified frame. If the
+> receiver's hash doesn't match, they should send a REQUEST_SAVESTATE command.
+
+**Command**: REQUEST_SAVESTATE
+Payload: None
+Description:
+    Requests that the peer send a savestate.
+
+**Command**: LOAD_SAVESTATE
+Payload:
+
+    {
+       frame number: uint32
+       uncompressed size: uint32
+       serialized save state: blob (variable size)
+    }
+
+Description:
+> Cause the other side to load a savestate, notionally one which the sending
+> side has also loaded. If both sides support zlib compression, the serialized
+> state is zlib compressed. Otherwise it is uncompressed.
+
+**Command**: PAUSE
+Payload:
+
+    {
+       nickname: char[32]
+    }
+
+Description:
+> Indicates that the core is paused. The receiving peer should also pause.  The
+> server should pass it on, using the known correct name rather than the
+> provided name.
+
+**Command**: RESUME
+Payload: None
+Description:
+> Indicates that the core is no longer paused.
+
+**Command**: STALL
+Payload:
+
+    {
+       frames: uint32
+    }
+
+Description:
+> Request that a client stall for the given number of frames.
+
+**Command**: RESET
+Payload:
+
+    {
+       frame number: uint32
+    }
+
+Description:
+> Indicate that the core was reset at the beginning of the given frame.
+
+**Command**: CHEATS
+Unused
+
+**Command**: FLIP_PLAYERS
+Payload:
+
+    {
+       frame number: uint32
+    }
+
+Description:
+> Flip players at the requested frame.
+
+**Command**: CFG
+Unused
+
+**Command**: CFG_ACK
+Unused
+

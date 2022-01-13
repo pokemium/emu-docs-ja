@@ -99,7 +99,7 @@ TODO
 
 これにより、サーバーとクライアントのどちらか（両方ではない）が、相手側の接続ヘッダをエコーすることで、一般化することができます。
 
-## Other features
+## その他の特徴
 
 一般的には、入力レイテンシは望まれないと考えられています。しかし、入力レイテンシも選択肢の一つです。
 
@@ -114,22 +114,29 @@ Netplayコマンドは、32ビットのコマンド識別子と、それに続�
 コマンド識別子は`netplay.h`に記載されており、以下にコマンドを説明します。特に指定のない限り、ペイロードの値はすべてネットワークのバイトオーダーに準拠です。
 
 **Command**: ACK
+
 Payload: None
+
 Description:
 > Acknowledgement. Not used.
 
 **Command**: NAK
+
 Payload: None
+
 Description:
 > Negative Acknowledgement. If received, the connection is terminated. Sent
 > whenever a command is malformed or otherwise not understood.
 
 **Command**: DISCONNECT
+
 Payload: None
+
 Description:
 > Gracefully disconnect. Not used.
 
 **Command**: INPUT
+
 Payload:
 
     {
@@ -142,6 +149,7 @@ Payload:
     }
 
 Description:
+
 > Input state for each frame. Netplay must send an INPUT command for every
 > frame in order to function at all. Client's player value is ignored. Server
 > indicates which frames are its own input data because INPUT is a
@@ -149,6 +157,7 @@ Description:
 > arrive after the server's input for the frame.
 
 **Command**: NOINPUT
+
 Payload:
 
     {
@@ -156,10 +165,12 @@ Payload:
     }
 
 Description:
+
 > Sent by the server to indicate a frame has passed when the server is not
 > otherwise sending data.
 
 **Command**: NICK
+
 Payload:
 
     {
@@ -170,6 +181,7 @@ Description:
 > Send nickname. Mandatory handshake command.
 
 **Command**: PASSWORD
+
 Payload:
 
     {
@@ -181,7 +193,8 @@ Description:
 > the server demands a password.
 
 **Command**: INFO
-Payload
+
+Payload:
 
     {
        core name: char[32]
@@ -197,6 +210,7 @@ Description:
 > agreement cannot be achieved, the correct solution is to simply disconnect.
 
 **Command**: SYNC
+
 Payload:
 
     {
@@ -218,12 +232,15 @@ Description:
 > nick.
 
 **Command**: SPECTATE
+
 Payload: None
+
 Description:
 > Request to enter spectate mode. The client should immediately consider itself
 > to be in spectator mode and send no further input.
 
 **Command**: PLAY
+
 Payload:
 
     {
@@ -237,6 +254,7 @@ Description:
 > is not necessarily honored. Payload may be elided if zero.
 
 **Command**: MODE
+
 Payload:
 
     {
@@ -258,6 +276,7 @@ Description:
 > that has been transmitted.
 
 **Command**: MODE_REFUSED
+
 Payload:
 
     {
@@ -268,6 +287,7 @@ Description:
 > Inform a client that its request to change modes has been refused.
 
 **Command**: CRC
+
 Payload:
 
     {
@@ -280,9 +300,11 @@ Description:
 > receiver's hash doesn't match, they should send a REQUEST_SAVESTATE command.
 
 **Command**: REQUEST_SAVESTATE
+
 Payload: None
+
 Description:
-    Requests that the peer send a savestate.
+> Requests that the peer send a savestate.
 
 **Command**: LOAD_SAVESTATE
 Payload:
@@ -299,6 +321,7 @@ Description:
 > state is zlib compressed. Otherwise it is uncompressed.
 
 **Command**: PAUSE
+
 Payload:
 
     {
@@ -311,11 +334,14 @@ Description:
 > provided name.
 
 **Command**: RESUME
+
 Payload: None
+
 Description:
 > Indicates that the core is no longer paused.
 
 **Command**: STALL
+
 Payload:
 
     {
@@ -326,6 +352,7 @@ Description:
 > Request that a client stall for the given number of frames.
 
 **Command**: RESET
+
 Payload:
 
     {
@@ -336,9 +363,11 @@ Description:
 > Indicate that the core was reset at the beginning of the given frame.
 
 **Command**: CHEATS
+
 Unused
 
 **Command**: FLIP_PLAYERS
+
 Payload:
 
     {
@@ -349,8 +378,10 @@ Description:
 > Flip players at the requested frame.
 
 **Command**: CFG
+
 Unused
 
 **Command**: CFG_ACK
+
 Unused
 

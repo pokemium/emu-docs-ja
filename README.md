@@ -9,6 +9,7 @@
 - [LLE vs HLE](lle-vs-hle.md)
 - [IPSファイル](ips_file_format.md)
 - [ネット対戦(WIP)](netplay.md)
+- [決定論的ネットコード](preparing-your-game-for-deterministic-netcode.md)
 - [その他・未分類のデータ](others/)
 
 ### コンソール

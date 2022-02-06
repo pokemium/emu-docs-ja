@@ -78,7 +78,8 @@ static const char* lut_files[] = {
     _"resources" _"hq4x.png"    // resource/hq4x.png 256x256
 };
 
-// インデックス指標(どの頂点を結んで線分を描くか)を保存する配列
+// インデックス指標(どの頂点を結んで線分を描くか)を保存する配列(IBO, EBO)
+// 参照: https://qiita.com/y_UM4/items/8b87e82c66c185905553
 static const uint8_t indices[] = { 0, 1, 2, 0, 2, 3 };
 
 static uint32_t image_width, image_height, image_scale = 2;
@@ -232,9 +233,10 @@ int main(int argc, const char* argv[])
     GLuint vertex_buffer;
     glGenBuffers(1, &vertex_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);  // 頂点バッファオブジェクトのメモリを確保し、そこにデータ (頂点属性) を転送
 
-    // すべてのアップスケール(HQx)シェーダーを含むベクタを初期化します。ベクタのインデックスはスケール倍率を表します。
+    // すべてのアップスケール(HQx)シェーダーを含むベクタを初期化する
+    // ベクタのインデックスはスケール倍率を表す
     std::vector<GLuint> programs, lut_textures;
     programs.push_back(NULL);       // programs:     シェーダープログラムを格納するベクタ
     lut_textures.push_back(NULL);   // lut_textures: 
@@ -250,7 +252,8 @@ int main(int argc, const char* argv[])
     GLint vpos_location = glGetAttribLocation(programs[1], "VertexCoord");
     GLint vtex_location = glGetAttribLocation(programs[1], "TexCoord");
 
-    // attribute変数を設定します。すべてのシェーダーは互換性のあるシグネチャを持っているので、この作業は一度しか行いません。
+    // attribute変数を設定。
+    // すべてのシェーダーは互換性のあるシグネチャを持っているので、この作業は一度しか行われない
     glEnableVertexAttribArray(vpos_location);
     glVertexAttribPointer(vpos_location, 4, GL_FLOAT, GL_FALSE, sizeof(vertices[0]), (void*)0);
     glEnableVertexAttribArray(vtex_location);
@@ -264,18 +267,19 @@ int main(int argc, const char* argv[])
         std::string shader_path(base_path);
         shader_path.append(shader_files[i]);    // e.g. shader_path = glsl/hq2x.glsl
 
-        // シェーダープログラム(program)の作成
+        // HQxシェーダープログラム(program)の作成
         read_file(shader_path.c_str(), shader);
         vertex_shader = compile_shader(GL_VERTEX_SHADER, shader.data());
         fragment_shader = compile_shader(GL_FRAGMENT_SHADER, shader.data());
         GLuint program = link_program(vertex_shader, fragment_shader);
 
-        // HQxシェーダーのUniform変数を設定
+        // HQxシェーダーのUniform変数ポインタを取得
         GLint mvp_location = glGetUniformLocation(program, "MVPMatrix");
         GLint samp_location = glGetUniformLocation(program, "Texture");
         GLint lut_location = glGetUniformLocation(program, "LUT");
         GLint tsize_location = glGetUniformLocation(program, "TextureSize");
 
+        // HQxシェーダーのUniform変数を設定
         glUseProgram(program);
         glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (const GLfloat*)mvp);
         glUniform1i(samp_location, 0);
@@ -287,23 +291,28 @@ int main(int argc, const char* argv[])
         lut_path.append(lut_files[i]);          // e.g. lut_path = resource/hq2x.png
         GLuint lut = load_texture(nullptr, nullptr, lut_path.c_str());
 
+        // ベクタにpush
         programs.push_back(program);
         lut_textures.push_back(lut);
     }
 
-    // ウィンドウのサイズをデフォルトの縮尺に変更し、レンダリングループに入る
+    // ウィンドウのサイズをデフォルトの縮尺(画像サイズの2倍)に変更し、レンダリングループに入る
     glfwSetWindowSize(window, image_width * image_scale, image_height * image_scale);
     while (!glfwWindowShouldClose(window)) {
+        // 指定されたウィンドウに割り当てられているフレームバッファのサイズを調べる
         int width, height;
         glfwGetFramebufferSize(window, &width, &height);
 
-        glViewport(0, 0, width, height);
+        glViewport(0, 0, width, height);    // ビューポート: コンピューターグラフィックの中で現在表示されている領域
         glClear(GL_COLOR_BUFFER_BIT);
 
+        // アップスケールテクスチャの適用
         glUseProgram(programs[image_scale]);
-        glActiveTexture(GL_TEXTURE1);
+        glActiveTexture(GL_TEXTURE1);           // 事前にGL_TEXTURE0にスケール対象の画像を読み込んでいる
         glBindTexture(GL_TEXTURE_2D, lut_textures[image_scale]);
 
+        // 四角形(ゲームスクリーン)の描画
+        // 三角形(GL_TRIANGLES)2つの描画で四角形を表現するので必要な頂点数(第2引数)は6
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, indices);
 
         glfwSwapBuffers(window);
